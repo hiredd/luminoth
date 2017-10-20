@@ -153,7 +153,8 @@ def run(custom_config, model_type, override_params, target='',
                     prediction_dict, with_rcnn=config.network.with_rcnn,
                     output_dir=checkpoint_dir,
                     every_n_steps=config.train.display_every_steps,
-                    every_n_secs=config.train.display_every_secs
+                    every_n_secs=config.train.display_every_secs,
+                    image_vis='train'
                 )
             )
 
