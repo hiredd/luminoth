@@ -4,6 +4,8 @@ import yaml
 
 from easydict import EasyDict
 
+REPLACE_KEY = '_replace'
+
 
 def load_config(filenames, warn_overwrite=True):
     if len(filenames) <= 0:
@@ -50,6 +52,26 @@ def types_compatible(new_config_value, base_config_value):
     return isinstance(new_config_value, type(base_config_value))
 
 
+def should_replace(new_config, base_config, key):
+    """Find out whether we should replace a key when merging.
+    """
+    try:
+        base_replace = base_config[key][REPLACE_KEY]
+    except KeyError:
+        base_replace = None
+    try:
+        new_replace = new_config[key][REPLACE_KEY]
+    except KeyError:
+        new_replace = None
+
+    if new_replace:
+        return True
+    elif new_replace is None and base_replace:
+        return True
+
+    return False
+
+
 def merge_into(new_config, base_config, overwrite=False, warn_overwrite=False):
     """Merge one easy dict into another.
 
@@ -71,10 +93,15 @@ def merge_into(new_config, base_config, overwrite=False, warn_overwrite=False):
 
         # Recursively merge dicts
         if isinstance(value, dict):
-            base_config[key] = merge_into(
-                new_config[key], base_config.get(key, EasyDict({})),
-                overwrite=overwrite, warn_overwrite=warn_overwrite
-            )
+            # Sometimes we want to completely replace the original key (i.e.
+            # deleting all keys that aren't in new_config).
+            if (should_replace(new_config, base_config, key)):
+                base_config[key] = value
+            else:
+                base_config[key] = merge_into(
+                    new_config[key], base_config.get(key, EasyDict({})),
+                    overwrite=overwrite, warn_overwrite=warn_overwrite
+                )
         else:
             if base_config.get(key) is None:
                 base_config[key] = value

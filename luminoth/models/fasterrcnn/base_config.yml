@@ -40,6 +40,9 @@ train:
   full_trace: False
   # Learning rate config.
   learning_rate:
+    # Because we're using kwargs, we want the learning_rate dict to be replaced
+    # as a whole.
+    _replace: True
     # Learning rate decay method ((empty), "none", piecewise_constant, exponential_decay, polynomial_decay)
     # You can define different decay methods using `decay_method` and defining all the necessary arguments.
     decay_method:
@@ -47,6 +50,9 @@ train:
 
   # Optimizer config
   optimizer:
+    # Because we're using kwargs, we want the optimizer dict to be replaced
+    # as a whole.
+    _replace: True
     # Type of optimizer to use (momentum, adam, gradient_descent, rmsprop)
     type: momentum
     # any options are passed directly to the optimizer as kwarg.

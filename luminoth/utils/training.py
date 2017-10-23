@@ -1,6 +1,7 @@
 import tensorflow as tf
 
 from luminoth.utils.vars import variable_summaries
+from luminoth.utils.config import REPLACE_KEY
 
 
 OPTIMIZERS = {
@@ -52,6 +53,9 @@ def get_learning_rate(train_config, global_step=None):
         ]
 
     decay_function = LEARNING_RATE_DECAY_METHODS[decay_method]
+
+    # Delete the '_replace' key if it exists.
+    lr_config.pop(REPLACE_KEY, None)
     learning_rate = decay_function(
         **lr_config
     )
@@ -96,6 +100,8 @@ def get_optimizer(train_config, global_step=None):
         )
 
     optimizer_cls = OPTIMIZERS[optimizer_type]
+    # Delete the '_replace' key if it exists.
+    optimizer_config.pop(REPLACE_KEY, None)
     return optimizer_cls(learning_rate, **optimizer_config)
 
 
